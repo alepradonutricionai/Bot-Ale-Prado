@@ -54,19 +54,22 @@ function bateria(cfg) {
     ['negritas **',     (t) => /\*\*[^*]+\*\*/.test(t)],
     ['frase de IA',     (t) => /con mucho gusto te informo|es un placer atenderte|estoy aquí para ayudarte/i.test(t)],
     ['anuncia revisar', (t) => /(déjame|dejame|permíteme|permiteme)\s+(verificar|revisar|checar|un momento)|ahorita (reviso|checo|verifico)|voy a revisar/i.test(t)],
-    ['cierre pasivo',   (t) => /\b(cualquier duda (estoy|aquí)|espero (su|tu) respuesta|quedo al pendiente|estamos al pendiente|no dude[s]? en escribir)/i.test(t)],
-    ['supone género',   (t) => /\bbienvenid[oa]\b/i.test(t)],
+    ['cierre pasivo',   (t) => /\b(cualquier duda (estoy|aquí)|espero (su|tu) respuesta|quedo al pendiente|estamos al pendiente|no dude[s]? en escribir|cualquier cosa,? (aquí|por aquí)|aquí (ando|andamos|te espero)|con gusto te ayudo)/i.test(t)],
+    ['supone género',   (t) => /\b(bienvenid[oa]|t[úu] mism[oa]|interesad[oa])\b/i.test(t)],
+    ['urgencia falsa',  (t) => /se (van|están) (llenando|acabando)|quedan pocos/i.test(t)],
   ];
   // "Tutear a un contacto, siempre usted" → solo aplica si el cliente lo pidió.
   if (pide('tutear')) reglas.push(['tuteo', (t) => TUTEO.test(t)]);
   return reglas;
 }
 
-function bloquesSystem() {
+function bloquesSystem(messages) {
   // Mismo armado que services/claude.ts: estático cacheado primero.
+  const yaSePresento = messages.some((m) => m.role === 'assistant');
   return [
     { type: 'text', text: buildSystemPrompt(), cache_control: { type: 'ephemeral' } },
-    { type: 'text', text: '\n\n---\n## CONTEXTO DEL TURNO\n- Canal de entrada: whatsapp\n- Estado del teléfono del contacto: tiene WhatsApp\n' },
+    { type: 'text', text: '\n\n---\n## CONTEXTO DEL TURNO\n- Canal de entrada: whatsapp\n- Estado del teléfono del contacto: tiene WhatsApp\n' +
+      `- Ya te presentaste en esta conversación: ${yaSePresento ? 'sí, NO te vuelvas a presentar' : 'no. Este es tu primer mensaje: empieza con "Hola! Soy la asistente virtual de Ale Prado" aunque vayas a escalar, recibir un comprobante o hablar de un caso médico'}\n` },
   ];
 }
 
@@ -91,7 +94,7 @@ async function unTurno(client, model, variante, messages, cfg, acum) {
     iter++;
     const body = {
       model, max_tokens: cfg.behavior.max_response_tokens,
-      system: bloquesSystem(), tools: TOOLS, messages,
+      system: bloquesSystem(messages), tools: TOOLS, messages,
     };
     if (variante === 'nothink') body.thinking = { type: 'disabled' };
     const r = await client.messages.create(body);

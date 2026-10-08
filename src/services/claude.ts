@@ -433,6 +433,9 @@ export async function getClaudeResponse(
         `\n\n---\n## CONTEXTO DEL TURNO (volátil — cambia por canal)\n` +
         `- Canal de entrada: ${channel}\n` +
         `- Estado del teléfono del contacto: ${describeChannel(channel)}\n` +
+        // Sin esta línea el modelo adivina si ya se presentó, y en pruebas se
+        // saltaba la presentación (y con ella el aviso de que es IA) o la repetía.
+        `- Ya te presentaste en esta conversación: ${recentHistory.some((m) => m.role === 'assistant') ? 'sí, NO te vuelvas a presentar' : 'no. Este es tu primer mensaje: empieza con "Hola! Soy la asistente virtual de Ale Prado" aunque vayas a escalar, recibir un comprobante o hablar de un caso médico'}\n` +
         `Si el estado es "no_phone_yet" y vas a agendar una cita o pasar el contacto ` +
         `a una persona del equipo, pídele primero un número de WhatsApp.` +
         // Solo los tags que el yaml declara en context_tags (ej. "boleto-pagado"):

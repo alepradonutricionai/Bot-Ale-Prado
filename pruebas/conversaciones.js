@@ -20,7 +20,7 @@ module.exports = [
   ['vago-personal',      ['hola', 'quiero bajar de peso', 'trabajo en oficina todo el dia', 'y cuanto es']],
 
   // --- Dinero y pago: lo que el bot NUNCA confirma ---
-  ['comprobante',        ['ya pague', 'aqui esta el comprobante', 'ya quedo mi lugar entonces?', 'gracias']],
+  ['comprobante',        ['ya pague', '[el contacto envió una imagen: comprobante de transferencia de Mercado Pago por $470 MXN]', 'ya quedo mi lugar entonces?', 'gracias']],
   ['ya-pague-sin-foto',  ['ya hice el pago', 'no tengo captura, me sale error', 'y ahora?']],
   ['factura-y-meses',    ['me interesa pero necesito factura', 'y se puede a meses?', 'somos 5 de la oficina, hay precio de grupo?']],
   ['regateo',            ['esta caro para 90 min no?', 'no hay descuento?', 'mmm lo voy a pensar']],
