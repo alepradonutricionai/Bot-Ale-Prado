@@ -56,8 +56,8 @@ oferta:
   # Decidido el 20/09: $470 (el rango aprobado era $470–$670). Publicado en la landing.
   precio_boleto: "$470 MXN"
   lugares: 100
-  # ⚠️ PENDIENTE: link de Mercado Pago. Mientras diga PENDIENTE el bot no arranca.
-  link_pago: "PENDIENTE"
+  # Link de pago de Mercado Pago (lo mandó Ale el 08/10).
+  link_pago: "https://mpago.la/2h8BBdK"
   consulta_primera: "$2,000 MXN"
   consulta_seguimiento: "$1,500 MXN"
   consulta_duracion: "60 minutos"

@@ -8,7 +8,7 @@ Plantilla: `SKILLS/bot-ghl-template` + 3 ajustes propios (abajo).
 
 | # | Qué | Quién | Dónde se cambia |
 |---|---|---|---|
-| 1 | **Link de Mercado Pago**. Sin él el bot NO arranca (a propósito) | Ale | `oferta.link_pago` |
+| 1 | ~~Link de Mercado Pago~~ ✅ 08/10: https://mpago.la/2h8BBdK | Ale | `oferta.link_pago` |
 | 2 | ~~Nombre del bot~~ ✅ 07/10: sin nombre, "asistente virtual de Ale Prado" | Jorge | — |
 | 3 | **Si alguien compra y no puede ir el 17**: hoy el bot dice lo que ya es público (grabación y sorteo solo para quien está en vivo) y escala. Si Ale decide algo distinto, se cambia un párrafo | Ale | `prompt.md` → objeción "Y si ese día no puedo?" |
 | 4 | **Link de acceso a la sesión**: el bot no lo tiene y escala. Confirmar que va en los recordatorios del Workflow | Jorge | Workflow de GHL |
