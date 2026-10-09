@@ -18,6 +18,17 @@ Plantilla: `SKILLS/bot-ghl-template` + 3 ajustes propios (abajo).
 Precio ($470) y hora (11:00 am) se tomaron de las decisiones cerradas el 20/09
 (`CLIENTES/ALE PRADO/CLAUDE.md`), ya publicadas en la landing.
 
+## Dos landings, un solo cierre (08/10)
+
+- `deploy-sobrevive-oficina/`: botón al WhatsApp del bot → el bot manda el link de pago.
+- `deploy-sobrevive-oficina-compra/`: botón directo a Mercado Pago → al regresar, la
+  página pide mandar el comprobante por WhatsApp (mensaje prellenado "Ya pagué...").
+
+Las dos terminan igual: comprobante al bot → escala con `comprobante-recibido` → una
+persona valida en Mercado Pago, pone `boleto-pagado` y **manda el link del grupo de
+WhatsApp** (ideal: primer paso del Workflow de `boleto-pagado`). El bot NO tiene el link
+del grupo, a propósito: solo lo recibe quien ya pagó.
+
 ## Setup en GHL
 
 1. **PIT** con los scopes de la skill `crear-bot-ghl` (Paso 1.1) y el **Location ID**.

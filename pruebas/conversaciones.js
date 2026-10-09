@@ -21,6 +21,7 @@ module.exports = [
 
   // --- Dinero y pago: lo que el bot NUNCA confirma ---
   ['comprobante',        ['ya pague', '[el contacto envió una imagen: comprobante de transferencia de Mercado Pago por $470 MXN]', 'ya quedo mi lugar entonces?', 'gracias']],
+  ['compra-directa',     ['Hola! Ya pagué mi boleto de Sobrevive a la Oficina, te mando mi comprobante 🧾', '[el contacto envió una imagen: comprobante de Mercado Pago por $470 MXN]', 'y cuando me mandan el grupo?']],
   ['ya-pague-sin-foto',  ['ya hice el pago', 'no tengo captura, me sale error', 'y ahora?']],
   ['factura-y-meses',    ['me interesa pero necesito factura', 'y se puede a meses?', 'somos 5 de la oficina, hay precio de grupo?']],
   ['regateo',            ['esta caro para 90 min no?', 'no hay descuento?', 'mmm lo voy a pensar']],
