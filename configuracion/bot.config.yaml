@@ -107,8 +107,41 @@ behavior:
   model: claude-sonnet-4-6
   max_response_tokens: 1024
 
-# Sin pipeline ni calendario en v1: el bot no agenda (la consulta la agenda una
-# persona) y el seguimiento de compradores lo hace el Workflow de "boleto-pagado".
+# ===========================================================================
+# Pipeline (creado por API el 10/10/2026). Nombres EXACTOS a los de GHL.
+# ---------------------------------------------------------------------------
+#   SISTEMA: la pone el código en el primer mensaje; el modelo no la ve.
+#   AUTO:    la pone el código o un Workflow; el modelo no la ve ni puede
+#            sacar a nadie de ahí.
+#   (sin prefijo) la elige el modelo con mover_a_etapa.
+# Sin calendario: la consulta la agenda una persona.
+# ===========================================================================
+pipeline:
+  id: DxZj0la3RNiC3U0HPENL
+  name: Workshop Sobrevive a la Oficina
+  stage_on_first_message: Nuevo lead
+  stages:
+    - id: 31de9c09-2326-4864-9bdb-9f7153e8d16f
+      name: Nuevo lead
+      when: "SISTEMA: el código crea aquí la tarjeta en el primer mensaje del contacto."
+    - id: 10f511a5-01fe-4820-963a-410150f91763
+      name: Link de pago enviado
+      when: "En este mismo turno le mandaste el bloque con el link de pago de Mercado Pago."
+    - id: 3f0b78f3-af2e-4628-82f5-bd43f0ba27a4
+      name: Comprobante recibido
+      when: "AUTO: escalar_a_humano con categoria comprobante."
+    - id: f19fa7dc-f911-4a4d-9c71-ff848b69b69e
+      name: Boleto pagado
+      when: "AUTO: la mueve el Workflow de GHL cuando el equipo pone el tag boleto-pagado."
+    - id: a3220ea6-cc4d-407e-8a23-7939d4f5bbcb
+      name: Quiere consulta
+      when: "AUTO: escalar_a_humano con categoria consulta."
+    - id: 681a32a5-44bb-42f5-9321-1bd48bc63003
+      name: Requiere atención
+      when: "AUTO: escalar_a_humano con categoria paciente_actual u otro."
+    - id: 61d5160c-3476-41f8-bc7a-fb4c4582f3f8
+      name: No contestó
+      when: "AUTO: el marca-perdido, si no contesta después de los follow-ups."
 
 # ===========================================================================
 # Follow-ups automáticos, dentro de la ventana de 24h de WhatsApp
@@ -118,6 +151,10 @@ follow_ups:
   window_start_hour: 10
   window_end_hour: 22
   cadence_hours: [3, 10]
+  # Sin respuesta 20 h después del último mensaje del bot → "No contestó".
+  # No pisa etapas AUTO (comprobante, pagado, escalados).
+  lost_after_hours: 20
+  lost_stage: No contestó
   messages:
     - "Hola {nombre}, soy la asistente virtual de Ale Prado. Te quedó alguna duda del workshop Sobrevive a la Oficina? Si quieres te paso el link para apartar tu lugar."
     - "{nombre}, te escribo una última vez por lo del workshop del sábado 17 de octubre. Son solo 100 lugares, quieres que te aparte el tuyo?"
@@ -140,6 +177,10 @@ escalation:
     consulta: quiere-consulta
     paciente_actual: paciente-actual
     otro: revisar-equipo
+  stage: Requiere atención
+  category_stages:
+    comprobante: Comprobante recibido
+    consulta: Quiere consulta
 
 loop_guard:
   enabled: true

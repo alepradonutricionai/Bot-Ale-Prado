@@ -28,6 +28,12 @@ const PipelineSchema = z
   .object({
     id: z.string().min(1),
     name: z.string().min(1),
+    // Opcional: etapa donde se crea la tarjeta del contacto en su PRIMER
+    // mensaje (si no tiene una ya). Sin esto, la tarjeta solo nace cuando el
+    // bot mueve al contacto, y quien escribe y se va nunca aparece en el
+    // pipeline. Esa etapa debe llevar `when: "SISTEMA: ..."` para que el
+    // modelo no la vea ni pueda regresar a nadie ahí.
+    stage_on_first_message: z.string().optional(),
     stages: z
       .array(PipelineStageSchema)
       .min(1, 'pipeline debe tener al menos 1 etapa configurada')
@@ -267,6 +273,9 @@ const EscalationSchema = z.object({
   // equipo filtre en GHL qué tipo de caso es (ej. un comprobante de pago vs.
   // una persona que quiere consulta) y para disparar Workflows distintos.
   category_tags: z.record(z.string().min(1), z.string().min(1)).optional(),
+  // Opcional: etapa del pipeline POR CATEGORÍA (ej. comprobante → "Comprobante
+  // recibido"). Si la categoría no está aquí, se usa `stage`.
+  category_stages: z.record(z.string().min(1), z.string().min(1)).optional(),
 });
 
 const ConfigSchema = z.object({
@@ -342,6 +351,10 @@ const ConfigSchema = z.object({
       [['escalation', 'stage'], cfg.escalation?.stage],
       [['follow_ups', 'lost_stage'], cfg.follow_ups?.lost_stage],
       [['follow_ups', 'entry_stage'], cfg.follow_ups?.entry_stage],
+      [['pipeline', 'stage_on_first_message'], cfg.pipeline.stage_on_first_message],
+      ...Object.entries(cfg.escalation?.category_stages ?? {}).map(
+        ([cat, etapa]): [string[], string | undefined] => [['escalation', 'category_stages', cat], etapa]
+      ),
     ];
     for (const [path, valor] of refs) {
       if (valor && !nombres.has(valor)) {

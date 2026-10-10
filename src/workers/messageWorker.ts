@@ -1031,8 +1031,10 @@ async function handleEscalarAHumano(
         `${categoria ? `Categoría: ${categoria}. ` : ''}Motivo: ${motivoEscalacion}`
     );
     // Auto-mueve la opportunity a la etapa configurada (best-effort).
-    if (cfg.escalation.stage) {
-      autoMoveStage(contactId, cfg.escalation.stage, turn.leadLabel).catch(() => {});
+    const etapaEscalacion =
+      (categoria ? cfg.escalation.category_stages?.[categoria] : undefined) ?? cfg.escalation.stage;
+    if (etapaEscalacion) {
+      autoMoveStage(contactId, etapaEscalacion, turn.leadLabel).catch(() => {});
     }
     // Ya lo tiene un humano — cancela follow-ups/marca-perdido pendientes.
     cancelarFollowUpsPendientes(contactId).catch(() => {});
@@ -1326,6 +1328,19 @@ export async function startMessageWorker(concurrency = 5) {
       // real del contacto, si no el teléfono. Nunca un literal fijo.
       const turn: TurnContext = { leadLabel: contactName || phone || contactId };
 
+      // Tarjeta del pipeline desde el primer mensaje (pipeline.stage_on_first_message).
+      // findOrCreate no mueve a nadie que ya tenga tarjeta. Best-effort: si GHL
+      // falla, la conversación sigue.
+      const cfgPipe = getConfig().pipeline;
+      if (cfgPipe?.stage_on_first_message && process.env.GHL_LOCATION_ID) {
+        const entrada = cfgPipe.stages.find((s) => s.name === cfgPipe.stage_on_first_message);
+        if (entrada) {
+          await findOrCreateOpportunity(
+            contactId, cfgPipe.id, entrada.id, process.env.GHL_LOCATION_ID, turn.leadLabel
+          ).catch(() => []);
+        }
+      }
+
       // Tags del CRM que el modelo necesita ver (context_tags del yaml) y que
       // también suprimen follow-ups (follow_ups.skip_if_tags). Una sola
       // lectura por turno. Si GHL falla, al modelo no se le dice nada (mejor
@@ -1497,14 +1512,20 @@ export async function startMessageWorker(concurrency = 5) {
             }
           }
 
-          const escalationStageName = getConfig().escalation?.stage;
-          if (!yaCerrado && getConfig().pipeline && escalationStageName) {
+          // Todas las etapas de escalación: la general y las de cada categoría.
+          const esc = getConfig().escalation;
+          const escalationStageNames = new Set(
+            [esc?.stage, ...Object.values(esc?.category_stages ?? {})].filter((n): n is string => !!n)
+          );
+          if (!yaCerrado && getConfig().pipeline && escalationStageNames.size > 0) {
             const locationId = process.env.GHL_LOCATION_ID;
             if (locationId) {
               try {
                 const opps = await findContactOpportunity(contactId, getConfig().pipeline!.id, locationId);
-                const escaladaStage = getConfig().pipeline!.stages.find((s) => s.name === escalationStageName);
-                yaCerrado = !!escaladaStage && opps.some((o) => o.pipelineStageId === escaladaStage.id);
+                const escaladaIds = new Set(
+                  getConfig().pipeline!.stages.filter((s) => escalationStageNames.has(s.name)).map((s) => s.id)
+                );
+                yaCerrado = opps.some((o) => escaladaIds.has(o.pipelineStageId));
               } catch (e) {
                 console.warn(`[follow-up] check escalacion falló: ${(e as Error).message}`);
               }

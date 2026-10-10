@@ -30,9 +30,13 @@ function buildTools(): Anthropic.Tool[] {
   const cfg = getConfig();
 
   if (cfg.pipeline) {
-    const manualStages = cfg.pipeline.stages.filter(
-      (s) => !s.when.trim().toUpperCase().startsWith('AUTO')
-    );
+    // "SISTEMA:" (la etapa de entrada) tampoco va al modelo, pero a diferencia
+    // de "AUTO:" no cuenta como cierre: el follow-up y el marca-perdido siguen
+    // corriendo para quien está ahí.
+    const manualStages = cfg.pipeline.stages.filter((s) => {
+      const w = s.when.trim().toUpperCase();
+      return !w.startsWith('AUTO') && !w.startsWith('SISTEMA');
+    });
 
     if (manualStages.length > 0) {
       const stageNames = manualStages.map((s) => s.name);
