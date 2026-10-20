@@ -21,6 +21,10 @@ CREATE INDEX IF NOT EXISTS idx_conversations_last_activity ON conversations(last
 -- Tracking de follow-ups (mensajes proactivos cuando el lead no responde)
 ALTER TABLE conversations ADD COLUMN IF NOT EXISTS last_bot_message_at TIMESTAMPTZ;
 ALTER TABLE conversations ADD COLUMN IF NOT EXISTS follow_ups_sent INT NOT NULL DEFAULT 0;
+-- Cuándo salió el último follow-up. A diferencia de follow_ups_sent, NO se
+-- reinicia cuando el cliente contesta: es el tope entre tandas de follow-ups
+-- (follow_ups.min_gap_hours, ver followUpWorker.ts).
+ALTER TABLE conversations ADD COLUMN IF NOT EXISTS last_follow_up_at TIMESTAMPTZ;
 
 -- Lista negra + loop-guard (ver src/blocklist.ts y src/loop-guard.ts).
 -- blocked_at != NULL  → el bot ignora por completo a este contacto.

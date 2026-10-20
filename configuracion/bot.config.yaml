@@ -155,6 +155,11 @@ follow_ups:
   # No pisa etapas AUTO (comprobante, pagado, escalados).
   lost_after_hours: 20
   lost_stage: No contestó
+  # Tope entre tandas: cada respuesta del contacto (aunque sea "gracias")
+  # programa una tanda nueva de follow-ups. Sin esto, quien contesta con
+  # cortesía a cada recordatorio recibe otro sin fin (E186). El 2º toque de la
+  # misma tanda sí sale.
+  min_gap_hours: 48
   messages:
     - "Hola {nombre}, soy la asistente virtual de Ale Prado. Te quedó alguna duda del workshop Sobrevive a la Oficina? Si quieres te paso el link para apartar tu lugar."
     - "{nombre}, te escribo una última vez por lo del workshop del sábado 17 de octubre. Son solo 100 lugares, quieres que te aparte el tuyo?"

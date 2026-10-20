@@ -196,6 +196,12 @@ const FollowUpsSchema = z
     // Textos predefinidos de cada follow-up — uno por intento de la cadencia.
     // Soportan {nombre} (primer nombre del contacto, si se conoce).
     messages: z.array(z.string().min(1)).min(1).max(3),
+    // Mínimo de horas entre el último follow-up de una tanda y el primero de
+    // la siguiente. Cada respuesta del cliente (aunque sea "gracias") programa
+    // una tanda nueva; sin este tope, quien contesta con cortesía a cada
+    // recordatorio recibe otro sin fin (E186). No afecta el 2º toque de la
+    // misma tanda.
+    min_gap_hours: z.number().positive().default(48),
     // Opcional: marcar el lead como perdido moviéndolo a esta etapa del
     // pipeline N horas después (requiere bloque pipeline:). También < 24.
     lost_after_hours: z.number().positive().max(23).optional(),
